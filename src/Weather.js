@@ -8,18 +8,27 @@ function Weather() {
     const [ data, setData ] = useState(null)
 
     async function getWeather() {
-        const apikey = process.env.REACT_APP_OPENWEATHERMAP_API_KEY
-        const path = `http://api.openweathermap.org/data/2.5/weather?zip=${zip}&appid=${apikey}`
-        const res = await fetch(path) // stop !
-        const json = await res.json // stop !
-        console.log(json)
-        setData({ temp: 64, desc: "Scattered clouds" })
+        try {
+            const apikey = '99d7afef4025f501152e97275e4bd912'
+            const path = `http://api.openweathermap.org/data/2.5/weather?zip=${zip}&appid=${apikey}`
+            const res = await fetch(path) // stop !
+            const json = await res.json() // stop !
+            console.log(json)
+            const temp = json.main.temp
+            const desc = json.weather[0].description
+            const name = json.name 
+            setData( { temp, desc, name }  )
+        }   catch(err) {
+            console.log(err.message)
+        }
     }
 
     return (
         <div className="Weather">
-           { data ? <DisplayWeather {...data}/>: null  }
-           
+            <div>
+               <h3> { data ? <DisplayWeather {...data}/>: null  }</h3>
+            </div>
+
             <form 
             onSubmit={ e => {
                 e.preventDefault()

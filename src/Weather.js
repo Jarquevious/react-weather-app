@@ -2,16 +2,27 @@ import { useState } from "react";
 import "./Weather.css";
 import DisplayWeather from "./DisplayWeather";
 
+// ----------------------------------------------------------------
 function Weather() {
-  const [unit, setUnit] = useState("")
+  // const [unit, setUnit] = useState("");
   const [zip, SetZip] = useState("");
   const [data, setData] = useState(null);
 
   // ----------------------------------------------------------------
-  async function getWeather() {
-    try {
+  async function getWeatherByZip() {
       const apikey = "99d7afef4025f501152e97275e4bd912";
-      const path = `https://api.openweathermap.org/data/2.5/weather?zip=${zip}&appid=${apikey}&units=${unit},`;
+      const path = `https://api.openweathermap.org/data/2.5/weather?zip=${zip}&appid=${apikey}&units=imperial`;
+      getWeather(path)
+  }
+
+  async function getWeatherByLocation(lat, lon) {
+    const apikey =  "99d7afef4025f501152e97275e4bd912";
+    const path = `api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apikey}&units=imperial`;
+    getWeather(path)
+  }
+  // ----------------------------------------------------------------
+  async function getWeather(path) {
+    try {
       const res = await fetch(path); // stop !
       const json = await res.json(); // stop !
       console.log(json);
@@ -32,12 +43,8 @@ function Weather() {
   };
 
   function success(pos) {
-    var crd = pos.coords;
-
-    console.log("Your current position is:");
-    console.log(`Latitude : ${crd.latitude}`);
-    console.log(`Longitude: ${crd.longitude}`);
-    console.log(`More or less ${crd.accuracy} meters.`);
+    const crd = pos.coords;
+    getWeatherByLocation(crd.latitude, crd.longitude)
   }
 
   function error(err) {
@@ -54,14 +61,21 @@ function Weather() {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          getWeather();
+          getWeatherByZip();
         }}
       >
         {/* Input Field Begins Here */}
         <input value={zip} onChange={(e) => SetZip(e.target.value)} />
         {/* Submit Button Begins here */}
         <button type="submit">Submit</button>
-        <div className="row">
+        <button
+          onClick={() => {
+            navigator.geolocation.getCurrentPosition(success, error, options);
+          }}
+        >
+          By Location
+        </button>
+        {/* <div className="row">
           <label>
             <input
               type="radio"
@@ -72,24 +86,18 @@ function Weather() {
             />{" "}
             Fahrenheit
           </label>
-        </div>
-        <label>
-          <input
-            type="radio"
-            name="Unit"
-            value="Celsius"
-            checked={unit === "Celsius"}
-            onChange={(e) => setUnit("Celsius")}
-          />{" "}
-          Celsius
-        </label>
-        <button
-          onClick={() => {
-            navigator.geolocation.getCurrentPosition(success, error, options);
-          }}
-        >
-          By Location
-        </button>
+
+          <label>
+            <input
+              type="radio"
+              name="Unit"
+              value="Celsius"
+              checked={unit === "Celsius"}
+              onChange={(e) => setUnit("Celsius")}
+            />{" "}
+            Celsius
+          </label>
+        </div> */}
       </form>
     </div>
   );
